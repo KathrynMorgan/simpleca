@@ -3,13 +3,13 @@
 #
 # This is a script to help generate certificates for use with TLS.
 #
-# NOTE: you must make differences to the certificate fields 
+# NOTE: you must make differences to the certificate fields
 #       (e.g. the e-mail address), otherwise the new certificate
 #       overwrites the previously created and the script fails.
 #
 #set -x
 CA="BrainCraft.io"
-PREFIX=/root/eaptls/CertAuthority
+PREFIX=/root/simpleca
 CONFIG=${PREFIX}/openssl.cnf
 CA_DIR=${PREFIX}/${CA}
 
@@ -19,9 +19,9 @@ CA_DIR=${PREFIX}/${CA}
 
 while true; do
 	read -rp ">> You are about to erase critical CA Files and re-set your Certificate Authority!
->>  Are you sure you want to continue?  (y/n)  
+>>  Are you sure you want to continue?  (y/n)
  " yn
-        case $yn in 
+        case $yn in
 		[Yy]* ) echo "Continuing ....";
 			rm -rf ${CA_DIR}/*;
 			;;

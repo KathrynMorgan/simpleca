@@ -4,7 +4,7 @@
 # Base Variables
 #set -x
 CA="BrainCraft.io"
-PREFIX=/root/eaptls/CertAuthority
+PREFIX=/root/simpleca
 CONFIG=${PREFIX}/openssl.cnf
 req_DIR=${PREFIX}/signing_requests
 CA_DIR=${PREFIX}/${CA}
@@ -31,7 +31,7 @@ read -sp 'Enter New Certificate Password: ' cert_PWD
 read -sp 'Confirm New Certificate Password: ' cert_PWD_CONF
 [[ ${cert_PWD} == ${cert_PWD_CONF} ]] \
         && run_log 0 "${cert_NAME} Password Confirmed Successfully!" \
-        || run_log 1 "Password Does Not Match!" 
+        || run_log 1 "Password Does Not Match!"
 
 [[ ! -z "$cert_PWD" ]] && run_log 0 \
                        || run_log 1 "Certificate Password Cannot Be Empty!"
@@ -47,7 +47,7 @@ openssl req -config ${CONFIG}                   \
 
 [[ $? == "0" ]] \
 	&& run_log 0 "${run_MSG}" \
-	|| run_log 1 "Failed to ${run_MSG}" 
+	|| run_log 1 "Failed to ${run_MSG}"
 
 # Sign client certificate with CA's private key
 run_MSG="Sign certificate for: ${cert_NAME}"
@@ -60,7 +60,7 @@ openssl ca -config ${CONFIG}			\
 
 [[ $? == "0" ]] \
 	&& run_log 0 "${run_MSG}" \
-	|| run_log 1 "Failed to ${run_MSG}" 
+	|| run_log 1 "Failed to ${run_MSG}"
 
 # Export PKCS#12 version of the client certificate
 run_MSG="Create PKCS12 Key File"
@@ -75,65 +75,10 @@ openssl pkcs12					\
 
 [[ $? == "0" ]] \
 	&& run_log 0 "Success: ${run_MSG}" \
-	|| run_log 1 "Failed to Issue New Certificate for ${cert_NAME}" 
+	|| run_log 1 "Failed to Issue New Certificate for ${cert_NAME}"
 
 cp /root/eaptls/CertAuthority/BrainCraft.io/issuer/BrainCraft.io_CertAuthority_PubCertificate.pem ${client_DIR}/
 tar -Jcvf ${client_DIR}/${cert_NAME}-bundle.tar.xz ${client_DIR}/ ; echo "Created Bundle"
 run_MSG="Completed Client Certificate Enrollment"
 run_log 0 "${run_MSG}"
 rm -f ${req_DIR}/${cert_NAME}_SigningReq.pem \
-
-#rm -f ${cert_NAME}_Certificate.pem
-
-#openssl x509					\
-#	-inform PEM				\
-#	-outform DER				\
-#	-in ${cert_NAME}_Certificate.pem			\
-#	-out clientcert.der 
-
-##
-## SERVER
-##
-
-# Create a server certificate request and private key
-#openssl req -config ${CONFIG}                   \
-#        -new                                    \
-#        -keyout serverkey.pem                   \
-#        -out ${cert_NAME}_SigningReq.pem                         \
-#        -days 730                               \
-#        -passout pass:serverpwd
-
-# Sign server certificate with CA's private key
-#openssl ca -config ${CONFIG}                    \
-#        -policy policy_anything                 \
-#        -key capwd                              \
-#        -out servercert.pem                     \
-#        -passin pass:serverpwd                  \
-#        -infiles ${cert_NAME}_SigningReq.pem
-
-#rm -f ${cert_NAME}_SigningReq.pem
-#exit 0
-
-# Export PKCS#12 version of the server certificate
-#openssl pkcs12                                  \
-#        -export                                 \
-#        -in servercert.pem                      \
-#        -inkey serverkey.pem                    \
-#        -out servercert.p12                     \
-#        -clcerts                                \
-#        -passin pass:serverpwd                  \
-#        -passout pass:serverpwd
-
-#rm -f servercert.pem
-
-#openssl pkcs12                                  \
-#        -in servercert.p12                      \
-#        -out servercert.pem                     \
-#        -passin pass:serverpwd                  \
-#        -passout pass:serverpwd
-
-#openssl x509                                    \
-#        -inform PEM                             \
-#        -outform DER                            \
-#        -in servercert.pem                      \
-#        -out servercert.der
