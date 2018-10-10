@@ -1,0 +1,65 @@
+#!/bin/bash
+# ORIGIN = /etc/ssl/mkcert
+#
+# This is a script to help generate certificates for use with TLS.
+#
+# NOTE: you must make differences to the certificate fields 
+#       (e.g. the e-mail address), otherwise the new certificate
+#       overwrites the previously created and the script fails.
+#
+#set -x
+CA="BrainCraft.io"
+PREFIX=/root/eaptls/CertAuthority
+CONFIG=${PREFIX}/openssl.cnf
+CA_DIR=${PREFIX}/${CA}
+
+##
+## Initialize
+##
+
+while true; do
+	read -rp ">> You are about to erase critical CA Files and re-set your Certificate Authority!
+>>  Are you sure you want to continue?  (y/n)  
+ " yn
+        case $yn in 
+		[Yy]* ) echo "Continuing ....";
+			rm -rf ${CA_DIR}/*;
+			;;
+		[Nn]* ) echo "User Abort! Exiting ..."
+			exit 1
+			;;
+		    * ) echo "Please answer yes or no." ;;
+	esac
+    break
+done
+
+# Create directories
+[[ -d ${CA_DIR} ]] || mkdir ${CA_DIR}
+mkdir ${PREFIX}/signing_requests
+mkdir ${CA_DIR}/crl
+mkdir ${CA_DIR}/issued_certificates
+mkdir ${CA_DIR}/issuer
+mkdir ${CA_DIR}/issuer/private
+mkdir ${CA_DIR}/provisioned_clients
+touch ${CA_DIR}/serial
+touch ${CA_DIR}/index.attr
+
+##
+## CA
+##
+
+# Create a new CA certificate and private key
+openssl req -config ${CONFIG}			\
+	-new					\
+	-x509					\
+	-keyout ${CA_DIR}/issuer/private/${CA}_CertAuthority_PrivateKey.pem    \
+        -out ${CA_DIR}/issuer/${CA}_CertAuthority_PubCertificate.pem    \
+        -days 730				\
+        -passout pass:capwd
+
+# Create CA certificate serial number
+openssl x509 					\
+	-in ${CA_DIR}/issuer/${CA}_CertAuthority_PubCertificate.pem \
+	-noout					\
+	-next_serial				\
+	-out ${CA_DIR}/serial
