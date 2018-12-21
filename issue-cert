@@ -8,7 +8,9 @@ PREFIX=/root/simpleca
 CONFIG=${PREFIX}/openssl.cnf
 req_DIR=${PREFIX}/signing_requests
 CA_DIR=${PREFIX}/${CA}
+CA_ISSUER=${PREFIX}/${CA}/issuer
 target_DIR=${CA_DIR}/provisioned_clients
+
 
 # Status / Error Logging & Exit Function
 run_log () {
@@ -77,7 +79,7 @@ openssl pkcs12					\
 	&& run_log 0 "Success: ${run_MSG}" \
 	|| run_log 1 "Failed to Issue New Certificate for ${cert_NAME}"
 
-cp /root/eaptls/CertAuthority/BrainCraft.io/issuer/BrainCraft.io_CertAuthority_PubCertificate.pem ${client_DIR}/
+cp ${CA_ISSUER}/BrainCraft.io_CertAuthority_PubCertificate.pem ${client_DIR}/
 tar -Jcvf ${client_DIR}/${cert_NAME}-bundle.tar.xz ${client_DIR}/ ; echo "Created Bundle"
 run_MSG="Completed Client Certificate Enrollment"
 run_log 0 "${run_MSG}"
