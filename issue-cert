@@ -42,6 +42,7 @@ read -sp 'Confirm New Certificate Password: ' cert_PWD_CONF
 run_MSG="Generate private key & certificate signing request for ${cert_NAME}"
 openssl req -config ${CONFIG}                   \
 	-new					\
+	-addext "subjectAltName = DNS:${cert_NAME}" \
 	-keyout ${client_DIR}/${cert_NAME}_PrivateKey.pem     \
 	-out ${req_DIR}/${cert_NAME}_SigningReq.pem	\
 	-days 730				\

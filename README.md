@@ -1,3 +1,7 @@
+# BUG: [SRU] OpenSSL 1.1.1 Backport to Bionic LTS
+-- https://github.com/spaze/letsgetacert/issues/2
+-- https://bugs.launchpad.net/ubuntu/+source/openssl/+bug/1797386
+
 # SimpleCA
 
 Bash Wrapper for Manual OpenSSL Certificate Authority commands.
